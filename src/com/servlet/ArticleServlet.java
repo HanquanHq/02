@@ -111,7 +111,7 @@ public class ArticleServlet extends HttpServlet {
 				int whoId=((UserSingle)session.getAttribute("logoner")).getId();
 				String title=request.getParameter("title");
 				String content=request.getParameter("content");		//博客内容
-				String ratio = request.getParameter("ratoi"); 		// 重复率
+				String ratio = request.getParameter("ratio"); 		// 重复率
 				String hash = request.getParameter("hash"); 		// 哈希值
 				String time=Change.dateTimeChange(new Date());
 				int count=0;
