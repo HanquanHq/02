@@ -114,8 +114,9 @@ public class ArticleServlet extends HttpServlet {
 				String ratio = request.getParameter("ratio"); 		// 重复率
 				String hash = request.getParameter("hash"); 		// 哈希值
 				String time=Change.dateTimeChange(new Date());
-				int count=0;
-				
+				System.out.println("从全前端获取的重复率=" + ratio);
+				int count = 0;
+
 				Object[] params={whoId,title,content,time,count};
 				
 				int i=0;

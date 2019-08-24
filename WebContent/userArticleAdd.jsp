@@ -113,7 +113,8 @@
 									<div tabindex="4">
 			
 									<textarea style="height:auto" name="content" id="blogContent" rows="20"  ></textarea>
-									<input type="button" value="测试 " onclick="ajaxReq()"/><div id="showdiv"></div><!-- 6666666666666666666666666 -->
+									<input type="button" value="测试 " onclick="ajaxReq()"/><div id="showdiv"></div>		<!-- 计算重复率 -->
+									<input type="hidden" value="" id="hideValue" name="hideValue">										<!-- 隐藏的input元素 -->
 									</div>
 									<div id="author_footer" class="clearfix">
 									
@@ -265,6 +266,7 @@ document.getElementsByTagName('html')[0].style.paddingTop = '0px';
 					//处理响应内容
 					var showdiv=document.getElementById("showdiv");
 					showdiv.innerHTML=result;
+					document.getElementById("hideValue").value = "result";
 				}	
 			}	
 		}
@@ -275,11 +277,11 @@ document.getElementsByTagName('html')[0].style.paddingTop = '0px';
 				ajax.send("mytest="+mytest);
 	}
 </script>
-		<!--[if lt IE 9]>
-	<script src="js/html5shiv.min.js"></script>
-	<script src="js/respond.min.js"></script>
+<!--[if lt IE 9]>
+		<script src="js/html5shiv.min.js"></script>
+		<script src="js/respond.min.js"></script>
 <![endif]-->
-
+<input name="ratioInputBox"  value="">
 
 		<div id="wptdb_qTip" style="left: 1525px; top: 881px;"></div>
 	</body>

@@ -13,6 +13,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -24,11 +26,14 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.jspsmart.upload.Request;
+
 @WebServlet("/BlogCheckServlet")
 public class BlogCheckServlet extends HttpServlet {
 
 	/**
 	 * 计算重复率的主函数
+	 * 
 	 * @param blog 博客的字符串
 	 * @return 重复率
 	 * @throws IOException
@@ -36,8 +41,15 @@ public class BlogCheckServlet extends HttpServlet {
 	public static double myMain(String blog) throws IOException {
 		String utextout = new String(blog.getBytes("iso-8859-1"), "utf-8");// 解决乱码
 		String allStr = getSearchResult(utextout);
+		//allStr = doRegex(allStr, "[\\u4e00-\\u9fa5]");
+		System.out.println(allStr);
 		double sameRatio = calcSameRatio(utextout, allStr);
-		System.out.println("<h3>重复率：</h3>" + sameRatio);
+		if (sameRatio >= 0 && sameRatio < 1) {
+			sameRatio *= 0.8;
+		} else {
+			sameRatio = 0.9;
+		}
+		System.out.println("重复率：" + sameRatio);
 		return sameRatio;
 	}
 
@@ -62,8 +74,14 @@ public class BlogCheckServlet extends HttpServlet {
 		resp.getWriter().write("" + ratio);
 	}
 
+	/**
+	 * 找出百度搜索页中的所有快照链接
+	 * 
+	 * @param mess 搜索结果页的html代码
+	 * @return 所有快照链接
+	 * @throws IOException
+	 */
 	public static String craw(String mess) throws IOException {
-
 		String smess = URLEncoder.encode(mess, "UTF-8");
 		String urll = "http://www.baidu.com/s?wd=" + smess;
 		URL url = new URL(urll);
@@ -78,7 +96,6 @@ public class BlogCheckServlet extends HttpServlet {
 		Pattern pat = Pattern.compile(pattern);
 		Pattern h3_pat = Pattern.compile(h3_pattern);
 
-		InputStreamReader input1;
 		String[] sbArr = sb.toString().split("\n");
 
 		Matcher mach;
@@ -107,7 +124,7 @@ public class BlogCheckServlet extends HttpServlet {
 
 		return result.toString();
 	}
-	
+
 	/**
 	 * 读取链接对应的网页，返回字符串
 	 * 
@@ -146,59 +163,63 @@ public class BlogCheckServlet extends HttpServlet {
 		return sb.toString();
 	}
 
+
+
 	/**
-	 * ReadFile 读取txt文件，返回字符串
+	 * 对正则表达式的封装
 	 * 
-	 * @param f txt完整文件名称路径
-	 * @return txt中的内容
-	 * @throws IOException
+	 * @param str   要匹配的字符串
+	 * @param regex 正则表达式
+	 * @return 匹配结果（第一个）
 	 */
-	public static String read(File f) throws IOException {
-		Long filelength = f.length();
-		byte[] filecontent = new byte[filelength.intValue()];
-
-		FileInputStream in = new FileInputStream(f);
-		in.read(filecontent);
-		in.close();
-
-		return new String(filecontent); // 这里可以设置编码，第二个参数
+	public static String doRegex(String str, String regex) {
+		List<String> list = new ArrayList<String>();
+		Pattern p = Pattern.compile(regex);
+		Matcher m = p.matcher(str);
+		while (m.find()) {
+			list.add(m.group());
+		}
+		if (null == list || list.isEmpty()) {
+			return null;
+		} else {
+			return list.get(0);
+		}
 	}
 
-	public static String readHTML(File f) throws IOException {
-		StringBuilder sb = new StringBuilder();
-
-		FileInputStream fis = new FileInputStream(f);
-		InputStreamReader reader = new InputStreamReader(fis, "UTF-8"); // 最后的"GBK"根据文件属性而定，如果不行，改成"UTF-8"试试
-		BufferedReader br = new BufferedReader(reader);
-		String line;
-		while ((line = br.readLine()) != null) {
-			sb.append(line);
-		}
-		br.close();
-		reader.close();
-		return sb.toString();
-	}// 正则筛选字符串
-
-	public static String regEx(String str) {
+	/**
+	 * 筛选的字符串
+	 * 
+	 * @param str 带有html标签冗余的字符串
+	 * @return 提取出的纯净字符串
+	 */
+	public static String purifyStr(String str, boolean shouldPurifyURL) {
 		if (str.length() == 0)
 			return "";
 		String htmlStr = str; // 含html标签的字符串
+		
 		// 获取真实地址 过滤博客
-		String fliter;
-		int i1 = str.indexOf("href") > 0 ? str.indexOf("href") : 100000;
-		int i2 = str.indexOf("HREF") > 0 ? str.indexOf("HREF") : 100000;
+		if(shouldPurifyURL) {
+			String realURL = "";
+			int i1 = str.indexOf("href") > 0 ? str.indexOf("href") : 100000;
+			int i2 = str.indexOf("HREF") > 0 ? str.indexOf("HREF") : 100000;
 
-		int index = i1 <= i2 ? i1 : i2;
-		if (index > 0 && index < 200) {
-			fliter = str.substring(index + 10, index + 50);
-			if (fliter.indexOf("blog") < 0 && fliter.indexOf("jianshu") < 0) {
-				System.out.println("url中不包含blog/jianshu/douban，抛弃此链接" + "fliter=" + fliter);
+			int index = i1 <= i2 ? i1 : i2;
+			if (index > 0 && index < 200) {
+				realURL = str.substring(0, 200);
+				realURL = doRegex(realURL, "(?<=href=\")[a-z]+://[^\\s]*(?=\")");
+				System.out.println("realURL = " + realURL);
+				if (realURL != null && realURL.indexOf("blog") < 0
+						&& realURL.indexOf("jianshu") < 0 && realURL.indexOf("douban") < 0 && realURL.indexOf("baidu") < 0
+						&& realURL.indexOf("csdn") < 0) {
+					System.out.println("抛弃此链接");
+					return "";
+				}
+			} else {
+				System.out.println("找不到源链接，无法判断是否过滤" + str.substring(0, 200));
 				return "";
 			}
-		} else {
-			System.out.println("找不到源链接，无法判断是否过滤" + str.substring(0, 200));
-			return "";
 		}
+		
 
 		String textStr = "";
 		java.util.regex.Pattern p_script;
@@ -238,47 +259,65 @@ public class BlogCheckServlet extends HttpServlet {
 		textStr = textStr.replaceAll("\n", "");
 		textStr = textStr.substring(textStr.indexOf("不代表被搜索网站的即时页面") + 14, textStr.length() - 1);
 		return textStr;// 返回文本字符串
-	}// 保存到文件
-
-	public static void save(File f, String str) throws IOException {
-		BufferedWriter w = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(f, false), "UTF-8"));
-		w.write(str);
-		w.close();
 	}
 
+
+
+	/**
+	 * 根据博客内容返回百度搜索结果
+	 * 
+	 * @param utextout
+	 * @return
+	 * @throws IOException
+	 */
 	public static String getSearchResult(String utextout) throws IOException {
 
 		StringBuilder allStr = new StringBuilder();
 		String result = craw(utextout);// 搜索字符串
 		String[] urls = result.split("\n");// 跨平台的时候注意一下\r\n
-
+		int count = 0;
+		boolean shouldPurifyURL = true;
 		if (utextout.length() < 60) {// 输入过少的情况
 			utextout = utextout.substring(0, utextout.length() > 20 ? 20 : utextout.length());
+
 			for (String u : urls) {
+				if (count > 3) {// 合格链接总数小于3，则不抛弃
+					shouldPurifyURL = true;
+				}
 				String htmlStr = get(u);// 获取html代码
-				String str = regEx(htmlStr);// 正则
+				String str = purifyStr(htmlStr, shouldPurifyURL);// 正则
 				System.out.println(u + "\n");
-				allStr.append(str + "\n\n\n\n\n");// 追加
+				allStr.append(str);// 追加
+				count++;
 			}
 		} else {
 			// 20个字查一次 全部结果保存
 			for (int i = 0; i + 51 < utextout.length(); i += 50) {
+				if (count > 3) {// 合格链接总数小于3，则不抛弃
+					shouldPurifyURL = true;
+				}
 				String split = utextout.substring(i, i + 20);
 				craw(split);// 搜索字符串
 				for (String u : urls) {
 					String htmlStr = get(u);// 获取html代码
-					String str = regEx(htmlStr);// 正则
+					String str = purifyStr(htmlStr, shouldPurifyURL);// 正则
 					System.out.println(u + "\n");
-					// System.out.println(str);
 					allStr.append(str + "\n");// 追加
+					count++;
 				}
-				// save(new File(PATH + "2.txt"), allStr.toString());// 存储
 			}
 		}
 		System.out.println("----------------------visit each end---------------------------");
 		return allStr.toString();
-	}// 计算查重率
+	}
 
+	/**
+	 * 计算两个字符串的重复率
+	 * 
+	 * @param AA
+	 * @param BB
+	 * @return
+	 */
 	public static double calcSameRatio(String AA, String BB) {
 		String temp_strA = AA;
 		String temp_strB = BB;
@@ -332,8 +371,12 @@ public class BlogCheckServlet extends HttpServlet {
 					|| (charValue >= 'A' && charValue <= 'Z') || (charValue >= '0' && charValue <= '9');
 		}
 
-		/*
-		 * 求公共子串，采用动态规划算法。 其不要求所求得的字符在所给的字符串中是连续的。
+		/**
+		 * 动态规划求公共子串
+		 * 
+		 * @param strA
+		 * @param strB
+		 * @return
 		 */
 		public static String longestCommonSubstring(String strA, String strB) {
 			char[] chars_strA = strA.toCharArray();
@@ -341,11 +384,6 @@ public class BlogCheckServlet extends HttpServlet {
 			int m = chars_strA.length;
 			int n = chars_strB.length;
 
-			/*
-			 * 初始化矩阵数据,matrix[0][0]的值为0，
-			 * 如果字符数组chars_strA和chars_strB的对应位相同，则matrix[i][j]的值为左上角的值加1，
-			 * 否则，matrix[i][j]的值等于左上方最近两个位置的较大值， 矩阵中其余各点的值为0.
-			 */
 			int[][] matrix = new int[m + 1][n + 1];
 			for (int i = 1; i <= m; i++) {
 				for (int j = 1; j <= n; j++) {
@@ -355,11 +393,7 @@ public class BlogCheckServlet extends HttpServlet {
 						matrix[i][j] = Math.max(matrix[i][j - 1], matrix[i - 1][j]);
 				}
 			}
-			/*
-			 * 矩阵中，如果matrix[m][n]的值不等于matrix[m-1][n]的值也不等于matrix[m][n-1]的值，
-			 * 则matrix[m][n]对应的字符为相似字符元，并将其存入result数组中。
-			 * 
-			 */
+
 			char[] result = new char[matrix[m][n]];
 			int currentIndex = result.length - 1;
 			while (matrix[m][n] != 0) {
@@ -377,8 +411,11 @@ public class BlogCheckServlet extends HttpServlet {
 			return new String(result);
 		}
 
-		/*
-		 * 结果转换成百分比形式
+		/**
+		 * 结果转换成百分比
+		 * 
+		 * @param resule
+		 * @return
 		 */
 		public static String similarityResult(double resule) {
 			return NumberFormat.getPercentInstance(new Locale("en ", "US ")).format(resule);
