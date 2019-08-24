@@ -1,0 +1,210 @@
+/*the main demo bar (div)*/
+/*set the position of demo bar at plugin page > Look & Feel*/
+html {
+	padding-top: 31px;
+}
+
+#wpthemedemobar {
+	position: absolute;
+	top: 0px !important;
+}
+
+#wpthemedemobar {
+  position:absolute;
+  /*top:0px;*/
+  left:0px;
+  width:100%;
+  height:30px;
+  padding:0px;
+  margin:0px;
+  color:#444444;
+  font-weight: bold;
+  font-family: tahoma;
+  font-size: 11px;
+  z-index:100;
+}
+
+.wpthemedemobar_wrapper {
+  width:100%;
+  position:relative;
+  padding-top:7px;
+}
+
+/*currently not in used (a)*/
+#wpthemedemobar a,#wpthemedemobar a:link,#wpthemedemobar a:visited {
+  color:#444444;
+  font-weight: bold;
+  font-family: tahoma;
+  font-size: 11px;
+}
+  
+/*the theme's name (span)*/
+.wptdb_themename {
+  border-bottom:1px solid #cccccc;
+}
+  
+/*the left content including close button and etc (div)*/
+.wptdb_left {
+  position:absolute;
+  top:3px;
+  left:5px;
+}
+
+/*the images in the left content including close button and etc (img)*/
+.wptdb_left img {
+  margin-right:4px;
+}
+  
+/*the "currently previewing theme (previewed x times)" part (div)*/
+.wptdb_current {
+  margin:0 auto; 
+  text-align:center;
+}
+  
+/*the text : previewed x times (span)*/
+.wptdb_popularity { 
+  color:#888888;
+  font-weight:normal
+}
+
+/*quick jump area (div)*/
+.wptdb_jumpbar_wrapper {
+  position:absolute;
+  top:3px;
+  right:15px;
+}
+
+/*quick jump : select menu (select)*/
+.wptdb_jumpbar_select { 
+  background-color:#f1f1f1;
+  border:1px solid #cccccc;
+  font-size:11px;
+  font-weight:bold;
+  font-family:tahoma;
+  color:#333333;
+  vertical-align:top;
+  margin-top:3px;
+}
+
+/*quick jump : select menu > option (option)*/
+.wptdb_jumpbar_select option {
+  padding:1px;
+}
+
+/*quick jump (input type=button)*/
+#wpthemedemobar .wptdb_jumpbar_preview_button {
+  background-color:#2885B7;
+  border:1px solid #cccccc;
+  font:bold 11px tahoma;
+  color:#fff;
+  margin-left:5px;
+  padding:4px;
+  padding-left:9px;
+  padding-right:9px;
+  -moz-border-radius:5px;
+}
+
+
+/* qTip - Tooltip script */
+div#wptdb_qTip {
+ padding: 6px;
+ border: 1px solid #cccccc;
+ display: none;
+ background: #fff;
+ color: #333333;
+ font: 11px Verdana, Arial, sans-serif;
+ text-align: left;
+ position: absolute;
+ z-index: 1000;
+}
+
+
+#respond {
+    position: relative;
+    overflow: hidden;
+    padding: 20px 40px;
+    font-size: 13px;
+}
+#respond div {
+    margin: 6px 0;
+    color: #7F9BC0;
+    font-size:20px;
+}
+.comment-login {
+    padding: 60px 0 0;
+    text-align: center;
+}
+.comment-login li {
+    margin: 20px 20px;
+}
+
+.comment-regists {
+    padding: 10px 130px 0;
+    text-align: right;
+}
+.comment-regists li {
+    margin: 20px 20px;
+}
+#respond label {
+    position: relative;
+    top: 5px;
+}
+#respond input {
+    width: 150px;
+    height: 18px;
+    border-top-style: initial;
+    border-right-style: initial;
+    border-left-style: initial;
+    border-top-color: initial;
+    border-right-color: initial;
+    border-left-color: initial;
+    border-image-source: initial;
+    border-image-slice: initial;
+    border-image-width: initial;
+    border-image-outset: initial;
+    border-image-repeat: initial;
+    color: rgb(79, 79, 79);
+    font-size: 13px;
+    font-family: 微软雅黑;
+    overflow: hidden;
+    padding: 2px;
+    outline: 0px;
+    border-width: 0px 0px 1px;
+    border-bottom: 1px dashed rgb(127, 155, 192);
+    background: 0px 0px;
+}
+#respond input.submitButton {
+    margin-right: 14px;
+    width: 66px;
+    height: 26px;
+    border-image-source: initial;
+    border-image-slice: initial;
+    border-image-width: initial;
+    border-image-outset: initial;
+    border-image-repeat: initial;
+    color: rgb(255, 255, 255);
+    font-size: 13px;
+    font-family: 微软雅黑;
+    cursor: pointer;
+    outline: 0px;
+    border-width: 0px;
+    border-style: initial;
+    border-color: initial;
+    border-radius: 0px;
+    background: rgb(127, 155, 192);
+}
+div.jbox .jbox-button {
+    color: #1E1D1D;
+}
+
+#cssClip {
+	width: 600px;
+	height: 28px;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	text-overflow: ellipsis; /* IE/Safari */
+	-ms-text-overflow: ellipsis;
+	-o-text-overflow: ellipsis; /* Opera */
+	-moz-binding: url("ellipsis.xml#ellipsis"); /*FireFox*/
+}
