@@ -1,9 +1,15 @@
-package blogCheckTools;
+package cn.hanquan.tools.blogCheck;
 
 import java.text.NumberFormat;
 import java.util.Locale;
 
-public class DynamicCalc {
+/**
+ * 动态规划计算子串工具类
+ * 
+ * @author Buuug
+ *
+ */
+public class DpTools {
 	/**
 	 * 计算两个字符串的重复率
 	 * 
@@ -15,7 +21,6 @@ public class DynamicCalc {
 		String temp_strA = AA;
 		String temp_strB = BB;
 		String strA, strB;
-		// 如果两个textarea都不为空且都不全为符号，则进行相似度计算，否则提示用户进行输入数据或选择文件
 		if (!(removeSign(temp_strA).length() == 0 && removeSign(temp_strB).length() == 0)) {
 			if (temp_strA.length() >= temp_strB.length()) {
 				strA = temp_strA;
@@ -44,19 +49,22 @@ public class DynamicCalc {
 		String sameStr = longestCommonSubstring(newStrA, newStrB);
 
 		System.out.println("没有符号的长字符串：" + newStrA);
-		System.out.println("没有符号的短字符串：" + sameStr);
+		System.out.println("没有符号的短字符串：" + newStrB);
+		System.out.println("公共子串：" + sameStr);
 		// 用较大的字符串长度作为分母，相似子串作为分子计算出字串相似度
 		int temp = newStrB.length();
 		int temp2 = sameStr.length();
 		return temp2 * 1.000 / temp;
 	}
 
-	/*
-	 * 将字符串的所有数据依次写成一行
+	/**
+	 * 删除字符串中的非汉字部分
+	 * 
+	 * @param str
+	 * @return
 	 */
 	static String removeSign(String str) {
 		StringBuffer sb = new StringBuffer();
-		// 遍历字符串str,如果是汉字数字或字母，则追加到ab上面
 		for (char item : str.toCharArray())
 			if (charReg(item)) {
 				sb.append(item);
@@ -65,19 +73,23 @@ public class DynamicCalc {
 		return sb.toString();
 	}
 
-	/*
-	 * 判断字符是否为汉字，数字和字母， 因为对符号进行相似度比较没有实际意义，故符号不加入考虑范围。
+	/**
+	 * 判断字符是否为汉字
+	 * 
+	 * @param charValue
+	 * @return
 	 */
 	private static boolean charReg(char charValue) {
-		return (charValue >= 0x4E00 && charValue <= 0X9FA5) || (charValue >= 'a' && charValue <= 'z')
-				|| (charValue >= 'A' && charValue <= 'Z') || (charValue >= '0' && charValue <= '9');
+//		return (charValue >= 0x4E00 && charValue <= 0X9FA5) || (charValue >= 'a' && charValue <= 'z')
+//				|| (charValue >= 'A' && charValue <= 'Z') || (charValue >= '0' && charValue <= '9');
+		return (charValue >= 0x4E00 && charValue <= 0X9FA5);
 	}
 
 	/**
 	 * 动态规划求公共子串
 	 * 
-	 * @param strA
-	 * @param strB
+	 * @param strA 短字符串
+	 * @param strB 长字符串
 	 * @return
 	 */
 	private static String longestCommonSubstring(String strA, String strB) {

@@ -1,4 +1,4 @@
-package blogCheckTools;
+package cn.hanquan.tools.blogCheck;
 
 import java.io.BufferedReader;
 import java.io.IOException;

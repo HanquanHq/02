@@ -10,11 +10,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.log4j.Logger;
+
 import com.dao.UserDao;
 import com.toolsBean.Change;
 import com.valueBean.UserSingle;
 
 public class UserLogon extends HttpServlet {
+	Logger logger = Logger.getLogger(BlogCheckServlet.class);
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)throws ServletException, IOException {
 		doPost(request,response);
@@ -38,20 +41,21 @@ public class UserLogon extends HttpServlet {
 					UserDao userDao=new UserDao();
 					logoner=userDao.getLogoner(new Object[]{name,pswd});
 					if(logoner==null)
-						message="<li>输入的　<b>用户名</b> 或　<b>密码</b>　不正确！</li>";
-					else{
-						message="<li>登录成功！</li>";
-						session.setAttribute("logoner",logoner);
+						message = "<li>输入的　<b>用户名</b> 或　<b>密码</b>　不正确！</li>";
+					else {
+						message = "<li>登录成功！</li>";
+						session.setAttribute("logoner", logoner);
+						logger.debug(logoner + "登录成功");
 					}
 				} catch (SQLException e) {
-					message="<li>登录失败！</li>";
+					message = "<li>登录失败！</li>";
 					e.printStackTrace();
 				}
-			}			
-		}		
-		
-		request.setAttribute("message",message);
-		RequestDispatcher rd=request.getRequestDispatcher(forward);
+			}
+		}
+
+		request.setAttribute("message", message);
+		RequestDispatcher rd = request.getRequestDispatcher(forward);
 		rd.forward(request,response);		
 	}
 	private String validateLogon(String name,String pswd){

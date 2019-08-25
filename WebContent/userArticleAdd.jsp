@@ -20,9 +20,8 @@
 	
 	
 
-	
-	<c:set var="master" value="${sessionScope.callBlogMaster}"/>
-	
+<c:set var="master" value="${sessionScope.callBlogMaster}"/>
+<%-- 	<c:set var="master" value="${sessionScope.logoner}"/> --%>
 	    <jsp:include page="commonUserHeader.jsp"/>					
 		
 		<div id="m-container" class="container">
@@ -113,8 +112,8 @@
 									<div tabindex="4">
 			
 									<textarea style="height:auto" name="content" id="blogContent" rows="20"  ></textarea>
-									<input type="button" value="测试 " onclick="ajaxReq()"/><div id="showdiv"></div>		<!-- 计算重复率 -->
-									<input type="hidden" value="" id="hideValue" name="hideValue">										<!-- 隐藏的input元素 -->
+									<input type="button" value="生成博文信息卡片 " onclick="ajaxReq()"/><div id="showdiv"></div>		<!-- 计算重复率 -->
+									<input type="hidden" value="" id="hideValue" name="hideValue">									<!-- 隐藏的input元素 -->
 									</div>
 									<div id="author_footer" class="clearfix">
 									
@@ -137,6 +136,33 @@
 							</form>
 						</div>
 
+						<!-- 博文信息卡片：默认隐藏 -->
+						<div class="respond" id="divCard" style="display:none;">
+							<table id="card" border="1">
+
+							<tr>
+							<td>用户名</td>
+							<td>${sessionScope.logoner.userName}</td>
+							</tr>
+							<tr>
+							<td>文章题目</td>
+							<td></td>
+							</tr>
+							<tr>
+							<td>创作时间</td>
+							<td></td>
+							</tr>
+							<tr>
+							<td>查重率</td>
+							<td></td>
+							</tr>
+							<tr>
+							<td>Hash</td>
+							<td></td>
+							</tr>
+							</table>
+						</div>
+						
 					</div>
 				</div>
 				</section>
@@ -242,12 +268,14 @@ document.getElementsByTagName('html')[0].style.paddingTop = '0px';
 </div>
 
 <script type="text/javascript">
-	// Ajax
+	// 点击"生成博文信息卡片"触发的函数，使用ajax与服务器交互
 	function ajaxReq(){
 		//获取用户请求数据
-
-		var mytest=document.getElementById("blogContent").value;
-		alert(mytest);
+		var showdiv=document.getElementById("showdiv");//加载中gif图片位置
+		var mytest=document.getElementById("blogContent").value;//博客内容
+		var blogTitle=document.getElementById("title").value;//博客标题
+		var hash = new String(mytest).hashCode();//计算哈希
+		//alert("你的文章内容："+mytest);
 		//创建ajax引擎对象
 		var ajax;
 		if(window.XMLHttpRequest){
@@ -264,10 +292,35 @@ document.getElementsByTagName('html')[0].style.paddingTop = '0px';
 					//获取响应内容
 					var result=ajax.responseText;
 					//处理响应内容
-					var showdiv=document.getElementById("showdiv");
-					showdiv.innerHTML=result;
-					document.getElementById("hideValue").value = "result";
+					//showdiv.innerHTML=result;
+					document.getElementById("hideValue").value = "result";//查重结果
+					
+					document.getElementById("divCard").style.display="block";
+					
+					document.getElementById("card")
+					  .getElementsByTagName("tr")[1]
+					  .getElementsByTagName("td")[1]
+					  .innerHTML = blogTitle;	//博文题目
+					  
+					  document.getElementById("card")
+					  .getElementsByTagName("tr")[2]
+					  .getElementsByTagName("td")[1]
+					  .innerHTML = getNowFormatDate();	//创作时间
+					  
+					  document.getElementById("card")
+					  .getElementsByTagName("tr")[3]
+					  .getElementsByTagName("td")[1]
+					  .innerHTML = result;	//查重率
+					  
+					  document.getElementById("card")
+					  .getElementsByTagName("tr")[4]
+					  .getElementsByTagName("td")[1]
+					  .innerHTML = hash;	//Hash
+					  
+					  showdiv.innerHTML="";
 				}	
+			}else{//加载中.gif
+				showdiv.innerHTML="<img src='images/loading.gif' width='100px' height='100px'/>";
 			}	
 		}
 		//发送请求
@@ -275,6 +328,37 @@ document.getElementsByTagName('html')[0].style.paddingTop = '0px';
 				ajax.open("post", "/02/BlogCheckServlet");
 				ajax.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
 				ajax.send("mytest="+mytest);
+	}
+	
+	
+	function getNowFormatDate() {//获取当前时间
+		var date = new Date();
+		var seperator1 = "-";
+		var seperator2 = ":";
+		var month = date.getMonth() + 1<10? "0"+(date.getMonth() + 1):date.getMonth() + 1;
+		var strDate = date.getDate()<10? "0" + date.getDate():date.getDate();
+		var currentdate = date.getFullYear() + seperator1  + month  + seperator1  + strDate
+				+ " "  + date.getHours()  + seperator2  + date.getMinutes()
+				+ seperator2 + date.getSeconds();
+		return currentdate;
+	}
+	
+	/**字符串哈希
+	 * @see http://stackoverflow.com/q/7616461/940217
+	 * @return {number}
+	 */
+	String.prototype.hashCode = function(){
+	    if (Array.prototype.reduce){
+	        return this.split("").reduce(function(a,b){a=((a<<5)-a)+b.charCodeAt(0);return a&a},0);              
+	    } 
+	    var hash = 0;
+	    if (this.length === 0) return hash;
+	    for (var i = 0; i < this.length; i++) {
+	        var character  = this.charCodeAt(i);
+	        hash  = ((hash<<5)-hash)+character;
+	        hash = hash & hash; // Convert to 32bit integer
+	    }
+	    return hash;
 	}
 </script>
 <!--[if lt IE 9]>

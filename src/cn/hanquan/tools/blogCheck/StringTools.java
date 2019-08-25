@@ -1,4 +1,4 @@
-package blogCheckTools;
+package cn.hanquan.tools.blogCheck;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,7 +30,7 @@ public class StringTools {
 				String htmlCode = getHtmlCode(baiduUrl);// 获取html代码
 				String purifiedStr = RegexTools.purifyStr(htmlCode, shouldPurifyURL);// 正则
 				System.out.println(baiduUrl + "\n");
-				purifiedStr = DynamicCalc.removeSign(purifiedStr);// 删除非字符
+				purifiedStr = DpTools.removeSign(purifiedStr);// 删除非字符
 				allStr.append(purifiedStr);// 删除空格并追加
 				baiduUrlCount++;
 				if(allStr.length()>=2000) {//避免计算时间过长
