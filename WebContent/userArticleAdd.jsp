@@ -2,6 +2,7 @@
 <%@ taglib uri="http://java.sun.com/jstl/core_rt" prefix="c"%>
 
 <!DOCTYPE html>
+
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html;charset=gbk">
@@ -11,17 +12,60 @@
 			type="text/css" media="screen">
 		<link rel="stylesheet" href="css/default.css" type="text/css">
 		 
-        
 		<script type="text/javascript" src="js/qtip.js"></script>
-
+		
+		<style type="text/css">
+		     .btn{  
+		        width: 200px;  
+		        padding:8px;  
+		        background-color: #428bca;  
+		        border-color: #357ebd;  
+		        color: #fff;  
+		        -moz-border-radius: 10px;  
+		        -webkit-border-radius: 10px;  
+		        border-radius: 10px; /* future proofing */  
+		        -khtml-border-radius: 10px; /* for old Konqueror browsers */  
+		        text-align: center;  
+		        vertical-align: middle;  
+		        border: 1px solid transparent;  
+		        font-weight: 900;  
+		        font-size:125%  
+		      }
+		      
+		        table
+		        {
+		            border-collapse: collapse;
+		            margin: 0 auto;
+		            text-align: center;
+		        }
+		        table td, table th
+		        {
+		            border: 1px solid #cad9ea;
+		            color: #666;
+		            height: 30px;
+		        }
+		        table thead th
+		        {
+		            background-color: #CCE8EB;
+		            width: 100px;
+		        }
+		        table tr:nth-child(odd)
+		        {
+		            background: #fff;
+		        }
+		        table tr:nth-child(even)
+		        {
+		            background: #F5FAFA;
+		        }
+		 </style>
+		 
 	</head>
 	
 	<body>
 	
 	
 
-<c:set var="master" value="${sessionScope.callBlogMaster}"/>
-<%-- 	<c:set var="master" value="${sessionScope.logoner}"/> --%>
+		<c:set var="master" value="${sessionScope.callBlogMaster}"/>
 	    <jsp:include page="commonUserHeader.jsp"/>					
 		
 		<div id="m-container" class="container">
@@ -98,29 +142,30 @@
 
 						<div  class="respond">
 							<form method="post" action="article?type=add&action=insert" >
-								
 								<div id="author_info" class="ui form">
 									<div class="ui three fields">
 										<div class="field">
 											<input type="text" name="title" id="title" class="text"
 												placeholder="请输入标题" value="">
 										</div>
-										
 									</div>
 								</div>
 								<div id="author_textarea" >
 									<div tabindex="4">
-			
-									<textarea style="height:auto" name="content" id="blogContent" rows="20"  ></textarea>
-									<input type="button" value="生成博文信息卡片 " onclick="ajaxReq()"/><div id="showdiv"></div>		<!-- 计算重复率 -->
-									<input type="hidden" value="" id="hideValue" name="hideValue">									<!-- 隐藏的input元素 -->
+										<textarea style="height:auto" name="content" id="blogContent" rows="20"  ></textarea>
+											<!--<div id="showdiv"></div>		显示重复率的div -->
+										<input type="hidden" value="" id="hideRatio" name="hideRatio">		<!-- 隐藏的input元素 -->
+										<input type="hidden" value="" id="hideHash" name="hideHash">		<!-- 隐藏的input元素 -->
 									</div>
 									<div id="author_footer" class="clearfix">
-									
-										<div id="submit-button">
-											<input id="submit" type="submit" name="submit" value="发布"
-												class="submit" >
-										</div>
+										
+											    <div style="padding:0;margin:0;float:left;box-sizing:border-box;">
+													<input type="button" class="btn" value="生成博文信息卡片 " onclick="ajaxReq()"/>								    
+												</div>
+												<div style="padding:0;margin:0;float:right;box-sizing:border-box;">
+													<input id="submit" class="btn" type="submit" name="submit" value="发布博客" >
+												</div>
+										
 									</div>
 								</div>
 								<input type="hidden" name="comment_post_ID" value="1432"
@@ -136,10 +181,12 @@
 							</form>
 						</div>
 
-						<!-- 博文信息卡片：默认隐藏 -->
-						<div class="respond" id="divCard" style="display:none;">
-							<table id="card" border="1">
 
+						<div id="showdiv"></div><!-- 加载中的图片显示 -->
+						<!-- 博文信息卡片：默认隐藏 -->
+						<br><br>
+						<div id="divCard" style="display:none">
+							<table id="card" class="table" style="width:100%;padding:auto;">
 							<tr>
 							<td>用户名</td>
 							<td>${sessionScope.logoner.userName}</td>
@@ -182,7 +229,7 @@
 		<div class="Copyright">
 			<p>
 				技术支持
-				<a href="http://www.mingrisoft.com" target="_blank">明日科技</a>
+				<a href="http://www.mingrisoft.com" target="_blank">Hanquan</a>
 			</p>
 		</div>
 		</footer>
@@ -263,9 +310,7 @@ document.getElementsByTagName('html')[0].style.paddingTop = '0px';
 		<script type="text/javascript"
 			src="js/home.js?ver=1.0">
 </script>
-<div tabindex="4">这里是测试
 
-</div>
 
 <script type="text/javascript">
 	// 点击"生成博文信息卡片"触发的函数，使用ajax与服务器交互
@@ -293,9 +338,10 @@ document.getElementsByTagName('html')[0].style.paddingTop = '0px';
 					var result=ajax.responseText;
 					//处理响应内容
 					//showdiv.innerHTML=result;
-					document.getElementById("hideValue").value = "result";//查重结果
+					document.getElementById("hideRatio").value = result;	//将Ratio放入隐藏元素用于提交
+					document.getElementById("hideHash").value = hash;		//将Hash放入隐藏元素用于提交
 					
-					document.getElementById("divCard").style.display="block";
+					document.getElementById("divCard").style.display="block";//block显示 none隐藏
 					
 					document.getElementById("card")
 					  .getElementsByTagName("tr")[1]
@@ -317,7 +363,7 @@ document.getElementsByTagName('html')[0].style.paddingTop = '0px';
 					  .getElementsByTagName("td")[1]
 					  .innerHTML = hash;	//Hash
 					  
-					  showdiv.innerHTML="";
+					  showdiv.innerHTML="";//清空原来div中显示的图片
 				}	
 			}else{//加载中.gif
 				showdiv.innerHTML="<img src='images/loading.gif' width='100px' height='100px'/>";

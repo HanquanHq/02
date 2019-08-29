@@ -146,6 +146,8 @@
 		</div>
 
 		<div id="unLogin" style="margin-left: 500px;">
+		<a href="/02/Search.jsp" style="color: #e15782"><span
+				class="menuTitle">ËÑË÷</span><span class="en"></span> </a>
 			<a href="javascript:loginIndex();" id="topnav_current"><span
 				class="menuTitle">¿ìËÙµÇÂ¼</span><span class="en"></span> </a>
 			<a href="javascript:reg();" style="color: #e15782"><span

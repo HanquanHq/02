@@ -20,7 +20,7 @@ public class Checker {
 		logger.debug("没有符号的allStr：" + searchResult);
 
 		double sameRatio = DpTools.calcSameRatio(blog, searchResult);
-		sameRatio = sameRatio >= 0.99 ? 0.99 : sameRatio * 0.7;// 毫无根据的手动调整
+		sameRatio = sameRatio >= 0.99 ? 0.50 : sameRatio * 0.7;// 毫无根据的手动调整
 		
 		System.out.println("调整的重复率：" + sameRatio);
 		return sameRatio;
@@ -32,7 +32,7 @@ public class Checker {
 	 * @throws IOException
 	 */
 	public static void main(String[] args) throws IOException {
-		double ratio = calcSameRatio("测试一下这句话会不会查重");
+		double ratio = calcSameRatio("测试一下这句话会下这句话会下这句话会下这句话会下这句话会不会查重");
 		System.out.println(ratio);
 	}
 }

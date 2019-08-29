@@ -87,58 +87,27 @@ public class RegexTools {
 	}
 
 	/**
-	 * 找出百度搜索页中的所有快照链接
+	 * 根据搜索内容在百度搜索，并返回百度搜索结果第一页中的所有快照链接
 	 * 
-	 * @param mess 搜索结果页的html代码
+	 * @param searchStr 搜索内容
 	 * @return 所有快照链接
 	 * @throws IOException
 	 */
-	public static String getBaiduQuickURL(String mess) throws IOException {
-		String smess = URLEncoder.encode(mess, "UTF-8");
-		String urll = "http://www.baidu.com/s?wd=" + smess;
-		URL url = new URL(urll);
+	public static List<String> getBaiduQuickURL(String searchStr) throws IOException {
+		String searchStrEncoded = URLEncoder.encode(searchStr, "UTF-8");// 对字符串编码
+		String searchUrl = "http://www.baidu.com/s?wd=" + searchStrEncoded;// 有搜索功能的baidu链接
+		URL url = new URL(searchUrl);
 		InputStream input = url.openStream();
+		String htmlCode = StringTools.inputStreamToString(input, "UTF-8");
 
-		// InputStream转化为String
-		String sb = new BufferedReader(new InputStreamReader(input)).lines()
-				.collect(Collectors.joining(System.lineSeparator()));
-
-		String pattern = "href=\"(http://cache.baiducontent.com/c\\?m=.+?)\".+$";// 正则匹配百度快照
-		String h3_pattern = "(a data-click)"; // 每个链接之前都有一个a data-click标签
-		Pattern pat = Pattern.compile(pattern);
-		Pattern h3_pat = Pattern.compile(h3_pattern);
-
-		String[] sbArr = sb.toString().split("\n");
-
-		Matcher mach;
-		Matcher machh3;
-
-		StringBuilder result = new StringBuilder();
-
-		boolean in = false;
-		for (String str : sbArr) {
-			machh3 = h3_pat.matcher(str); // 先看能不能匹配到h3 class标签，如果可以则进行匹配链接
-			while (machh3.find()) {
-				if (machh3.groupCount() > 0) {
-					in = true;
-				}
-			}
-			if (in) {
-				mach = pat.matcher(str); // 匹配链接
-				while (mach.find()) {
-					in = false;
-					System.out.println("结果" + mach.group(1));
-					result.append(mach.group(1) + "\n");
-				}
-			}
-		}
+		String pattern = "(?<=href=\")http://cache.baiducontent.com/c\\?m=.+?(?=\")";// 正则匹配百度快照
+		List<String> urls = doRegexList(htmlCode, pattern);
 		System.out.println("----------------------search end, begin visit each---------------------------");
-
-		return result.toString();
+		return urls;
 	}
 
 	/**
-	 * 对正则表达式的封装
+	 * 对正则表达式的封装:返回第一个
 	 * 
 	 * @param str   要匹配的字符串
 	 * @param regex 正则表达式
@@ -155,6 +124,38 @@ public class RegexTools {
 			return null;
 		} else {
 			return list.get(0);
+		}
+	}
+
+	/**
+	 * 对正则表达式的封装：返回list
+	 * 
+	 * @param str   要匹配的字符串
+	 * @param regex 正则表达式
+	 * @return 匹配结果（第一个）
+	 */
+	public static List<String> doRegexList(String str, String regex) {
+		List<String> list = new ArrayList<String>();
+		Pattern p = Pattern.compile(regex);
+		Matcher m = p.matcher(str);
+		while (m.find()) {
+			list.add(m.group());
+		}
+		if (null == list || list.isEmpty()) {
+			return null;
+		} else {
+			return list;
+		}
+	}
+
+	public static void main(String[] args) {
+		try {
+			List<String> list = getBaiduQuickURL("这是一个搜索内容");
+			for (String str : list) {
+				System.out.println(str);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 }

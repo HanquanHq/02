@@ -111,13 +111,17 @@ public class ArticleServlet extends HttpServlet {
 				int whoId=((UserSingle)session.getAttribute("logoner")).getId();
 				String title=request.getParameter("title");
 				String content=request.getParameter("content");		//博客内容
-				String ratio = request.getParameter("ratio"); 		// 重复率
-				String hash = request.getParameter("hash"); 		// 哈希值
+				
+				
+				String ratio = request.getParameter("hideRatio"); 		// 重复率
+				System.out.println("hideRatio="+ratio);
+				String hash = request.getParameter("hideHash"); 		// 哈希值
+				System.out.println("hideHash="+hash);
+				
 				String time=Change.dateTimeChange(new Date());
-				System.out.println("从全前端获取的重复率=" + ratio);
 				int count = 0;
 
-				Object[] params={whoId,title,content,time,count};
+				Object[] params={whoId,title,content,time,count,ratio,hash};
 				
 				int i=0;
 				try {

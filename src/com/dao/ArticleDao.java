@@ -155,7 +155,7 @@ public class ArticleDao extends SuperDao{
 	 * @功能：发表文章
 	 */
 	public int insert(Object[] params) throws SQLException{
-		String sql="insert into tb_article values(?,?,?,?,?)";
+		String sql="insert into tb_article values(?,?,?,?,?,?,?)";
 		DB mydb=new DB();
 		mydb.doPstm(sql,params);
 		int i=mydb.getCount();

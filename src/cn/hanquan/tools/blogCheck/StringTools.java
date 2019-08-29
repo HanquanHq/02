@@ -1,9 +1,12 @@
 package cn.hanquan.tools.blogCheck;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.UnknownHostException;
+import java.util.List;
 
 public class StringTools {
 	/**
@@ -15,16 +18,15 @@ public class StringTools {
 	 */
 	public static String getSearchResult(String userBlogText) throws IOException {
 		StringBuilder allStr = new StringBuilder();// 过滤后的搜索结果（最终）
-		String baiduQuick = RegexTools.getBaiduQuickURL(userBlogText);// 所有快照链接
-		String[] baiduUrls = baiduQuick.split("\n");
+		List<String> baiduQuickUrls = RegexTools.getBaiduQuickURL(userBlogText);// 所有快照链接
 		int baiduUrlCount = 0;
-		boolean shouldPurifyURL = false;
+		boolean shouldPurifyURL = true;
 
 		if (userBlogText.length() < 60) {// 少于60字
 			userBlogText = userBlogText.substring(0, userBlogText.length() > 20 ? 20 : userBlogText.length());
-			for (String baiduUrl : baiduUrls) {
+			for (String baiduUrl : baiduQuickUrls) {
 				System.out.println("baiduUrlCount = " + baiduUrlCount);
-				if (baiduUrlCount > 1) {// 合格链接总数小于3，不抛弃
+				if (baiduUrlCount > 2) {// 合格链接总数小于3，不抛弃
 					shouldPurifyURL = true;
 				}
 				String htmlCode = getHtmlCode(baiduUrl);// 获取html代码
@@ -33,7 +35,8 @@ public class StringTools {
 				purifiedStr = DpTools.removeSign(purifiedStr);// 删除非字符
 				allStr.append(purifiedStr);// 删除空格并追加
 				baiduUrlCount++;
-				if(allStr.length()>=2000) {//避免计算时间过长
+				if(allStr.length()>=10000) {//避免计算时间过长
+					System.out.println("字数大于20000，不继续搜索");
 					return allStr.toString();
 				}
 			}
@@ -82,7 +85,14 @@ public class StringTools {
 		conn.setConnectTimeout(30000);// 设置相应超时时间
 		conn.setRequestProperty("User-Agent",
 				"Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36");
-		InputStream inputStream = conn.getInputStream();
+		InputStream inputStream=null;
+		try {
+		inputStream = conn.getInputStream();}
+		catch(UnknownHostException e) {
+			System.out.println("UnknownHostException"+e);
+			InputStream is = new ByteArrayInputStream("hhhh".getBytes());
+			return is;
+		}
 		return inputStream;
 	}
 
